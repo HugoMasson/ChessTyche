@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 WHITE_PLAYER = 2
 BLACK_PLAYER = 1
 
@@ -36,22 +38,24 @@ class Board:
 		]
 		"""
 		self.board = [
-			[25,00,00,00,22,00,00,25],
-			[00,00,00,22,00,00,00,00],
+			[25,24,23,00,22,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[22,00,00,15,00,00,22,00],
-			[00,00,00,00,00,14,00,00],
-			[00,00,00,00,00,00,00,21],
-			[00,00,00,22,00,00,00,00],
-			[15,00,00,00,12,00,00,15],
+			[00,00,00,00,00,00,00,00],
+			[00,00,00,00,00,00,00,00],
+			[00,00,00,00,00,00,00,00],
+			[00,00,00,00,00,00,00,00],
+			[00,00,00,00,00,00,00,00],
+			[15,14,13,00,12,00,00,00],
 		]
 
-	def whereIsKing(self, isW):
+	def whereIsKing(self, isW, arr="default"):
+		if arr == "default":
+			arr = self.board
 		for i in range(8):
 			for j in range(8):
-				if self.board[i][j] == 12 and isW:
+				if arr[i][j] == 12 and isW:
 					return i,j
-				elif self.board[i][j] == 22 and not isW:
+				elif arr[i][j] == 22 and not isW:
 					return i,j
 
 
@@ -150,44 +154,7 @@ class Board:
 			if self.isBlackPiece(x, y):
 				return False
 
-	def isAttacked(self, x, y, attackColor):
-		#attackColor = True -> mean white attack
-		if attackColor:
-			moves = self.getAllMovesPossible(WHITE_PLAYER, False)
-			v = list(moves.values())
-			for i in range(len(v)):
-				if self.coordToStandard(x, y) in v[i]:
-					key = self.standardToCoord(list(moves.keys())[i])
-					if self.board[key[0]][key[1]] == 11 and y+1 <= 7 and (y+1, x) == key:	#if is a pawn advancing (not capture)
-						pass
-					else:
-						print("Attaker white: ", self.board[key[0]][key[1]])
-						return True
-			if y+1 <= 7:
-				if x+1 <= 7 and self.board[y+1][x+1] == 11:
-					return True
-				if x-1 >= 0 and self.board[y+1][x-1] == 11:
-					return True
-		else:
-			moves = self.getAllMovesPossible(BLACK_PLAYER)
-			v = list(moves.values())
-			for i in range(len(v)):
-				if self.coordToStandard(x, y) in v[i]:
-					key = self.standardToCoord(list(moves.keys())[i])
-					if self.board[key[0]][key[1]] == 21 and y-1 <= 7 and (y-1, x) == key:	#if is a pawn advancing (not capture)
-						pass
-					else:
-						print("Attaker black: ", self.coordToStandard(x, y), list(moves.keys())[i], v[i])
-						return True
-			if y+1 <= 7:
-				if x+1 <= 7 and self.board[y-1][x+1] == 21:
-					return True
-				if x-1 >= 0 and self.board[y-1][x-1] == 21:
-					return True
-		return False
-
-
-	def isUnderAttack(self, x, y, attackColor, moves):
+	def isAttacked(self, x, y, attackColor, moves, arr):
 		#attackColor = True -> mean white attack
 		if attackColor:
 			#moves = self.getAllMovesPossible(WHITE_PLAYER, False)
@@ -195,15 +162,15 @@ class Board:
 			for i in range(len(v)):
 				if self.coordToStandard(x, y) in v[i]:
 					key = self.standardToCoord(list(moves.keys())[i])
-					if self.board[key[0]][key[1]] == 11 and y+1 <= 7 and (y+1, x) == key:	#if is a pawn advancing (not capture)
+					if arr[key[0]][key[1]] == 11 and y+1 <= 7 and (y+1, x) == key:	#if is a pawn advancing (not capture)
 						pass
 					else:
-						print("Attaker white: ", x, y, key[0], key[1])
+						#print("Attaker white: ", arr[key[0]][key[1]])
 						return True
 			if y+1 <= 7:
-				if x+1 <= 7 and self.board[y+1][x+1] == 11:
+				if x+1 <= 7 and arr[y+1][x+1] == 11:
 					return True
-				if x-1 >= 0 and self.board[y+1][x-1] == 11:
+				if x-1 >= 0 and arr[y+1][x-1] == 11:
 					return True
 		else:
 			#moves = self.getAllMovesPossible(BLACK_PLAYER)
@@ -211,17 +178,19 @@ class Board:
 			for i in range(len(v)):
 				if self.coordToStandard(x, y) in v[i]:
 					key = self.standardToCoord(list(moves.keys())[i])
-					if self.board[key[0]][key[1]] == 21 and y-1 <= 7 and (y-1, x) == key:	#if is a pawn advancing (not capture)
+					if arr[key[0]][key[1]] == 21 and y-1 <= 7 and (y-1, x) == key:	#if is a pawn advancing (not capture)
 						pass
 					else:
-						print("Attaker white: ", x, y, key[0], key[1])
+						#print("Attaker black: ", self.coordToStandard(x, y), list(moves.keys())[i], v[i])
 						return True
 			if y+1 <= 7:
-				if x+1 <= 7 and self.board[y-1][x+1] == 21:
+				if x+1 <= 7 and arr[y-1][x+1] == 21:
 					return True
-				if x-1 >= 0 and self.board[y-1][x-1] == 21:
+				if x-1 >= 0 and arr[y-1][x-1] == 21:
 					return True
 		return False
+
+
 			
 
 	def getAllPawnMoves(self, x, y, isW):	#pawn moves Ok
@@ -428,8 +397,7 @@ class Board:
 		return moves
 
 	def isCheck(self, tx, ty, moves):
-		if self.isUnderAttack(tx, ty, not self.isWhitePiece(tx,ty), moves):
-			print("check")
+		pass
 
 
 	#return list of all the possible moves for a position
@@ -470,6 +438,68 @@ class Board:
 		if 0 moves possible checkmate (while check)
 		if 0 moves possible pat (while not in check)
 		"""
+
+		isW = True
+		if player % 2 != 0:
+			isW = False
+
+
+		king = self.whereIsKing(isW)
+		moves = {
+
+		}
+		a = 0
+		if player % 2 == 0:	#to get the correct pieces (if black a = -10)
+			a = -10
+		for i in range(8):
+			for j in range(8):
+				p = self.board[i][j]+a
+				if p == 11:	#pawn
+					moves[self.coordToStandard(j, i)] = self.getAllPawnMoves(i, j, player % 2 != 0)
+				elif p == 13:
+					moves[self.coordToStandard(j, i)] = self.getAllKnightMoves(i, j, player % 2 != 0)
+				elif p == 14:
+					moves[self.coordToStandard(j, i)] = self.getAllBishopMoves(i, j, player % 2 != 0)
+				elif p == 15:
+					moves[self.coordToStandard(j, i)] = self.getAllRookMoves(i, j, player % 2 != 0)
+				elif p == 19:
+					moves[self.coordToStandard(j, i)] = self.getAllQueenMoves(i, j, player % 2 != 0)
+				elif p == 12:
+					moves[self.coordToStandard(j, i)] = self.getAllKingMoves(i, j, player % 2 != 0)
+
+
+		#rook / bishop don't work (block it with another piece or take it) 	!!!
+		#rock is proposed even when rook is not on board add a 
+
+
+		"""
+		logic:
+			keep track of what piece is the attacker
+			if one of the tested move is a take of attaker -> add move
+			or if one of the tested move is on the path of he attacker (if attacker is rook / bishop / queen)
+				store var of a redo of calcul of the piece with new pos (with move that block path)
+				if now attacker is still attacking cut move
+				else add move (bcs move cut the path to the king)
+
+		"""
+
+
+		#position check (if case has a rook else rook moved)				!
+		if self.isAttacked(king[1], king[0], not isW, moves, self.board):
+			b = deepcopy(self.board)
+			for key in movesAllowed.keys():
+				l = []
+				for i in range(len(movesAllowed[key])):
+					coord  = self.standardToCoord(key)
+					coord2 = self.standardToCoord(movesAllowed[key][i])
+					b[coord2[0]][coord2[1]] = b[coord[0]][coord[1]]
+					b[coord[0]][coord[1]] = 0
+					kingN = self.whereIsKing(isW, b)
+					if not self.isAttacked(kingN[1], kingN[0], not isW, moves, b):
+						l.append(movesAllowed[key][i])
+					b = deepcopy(self.board)
+				movesAllowed[key] = l
+
 
 		return movesAllowed
 			
