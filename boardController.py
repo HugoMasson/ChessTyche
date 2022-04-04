@@ -38,14 +38,14 @@ class Board:
 		]
 		"""
 		self.board = [
-			[25,00,00,00,22,00,00,00],
+			[25,00,23,24,22,00,00,00],
+			[00,00,00,00,00,00,00,00],
+			[00,00,21,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[00,00,00,00,00,00,00,00],
-			[00,00,00,00,00,00,00,00],
-			[00,00,00,00,00,00,00,00],
-			[15,00,00,00,12,00,00,00],
+			[00,00,00,00,00,00,11,00],
+			[15,00,00,00,12,14,13,00],
 		]
 
 	def whereIsKing(self, isW, arr="default"):
@@ -193,37 +193,41 @@ class Board:
 
 			
 
-	def getAllPawnMoves(self, x, y, isW):	#pawn moves Ok
+	def getAllPawnMoves(self, x, y, isW, arr="default"):	#pawn moves Ok
 		#x: up / down y: right / left
+		if arr == "default":
+			arr = self.board
 		moves = []
 		if isW:
 			if x-1 >= 0:
-				if self.board[x-1][y] == 0:
+				if arr[x-1][y] == 0:
 					moves.append(self.coordToStandard(y, x-1))
-					if x == 6 and self.board[x-2][y] == 0:	#never moved
+					if x == 6 and arr[x-2][y] == 0:	#never moved
 						moves.append(self.coordToStandard(y, x-2))
 				if y-1 >= 0:
-					if self.board[x-1][y-1] > 20:
+					if arr[x-1][y-1] > 20:
 						moves.append(self.coordToStandard(y-1, x-1))
 				if y+1 <= 7:
-					if self.board[x-1][y+1] > 20:
+					if arr[x-1][y+1] > 20:
 						moves.append(self.coordToStandard(y+1, x-1))
 		else:
 			if x+1 <= 7:
-				if self.board[x+1][y] == 0:
+				if arr[x+1][y] == 0:
 					moves.append(self.coordToStandard(y, x+1))
-					if x == 1 and self.board[x+2][y] == 0:	#never moved
+					if x == 1 and arr[x+2][y] == 0:	#never moved
 						moves.append(self.coordToStandard(y, x+2))
 				if y-1 >= 0:
-					if self.board[x+1][y-1] < 20 and self.board[x+1][y-1] != 0:
+					if arr[x+1][y-1] < 20 and arr[x+1][y-1] != 0:
 						moves.append(self.coordToStandard(y-1, x+1))
 				if y+1 <= 7:
-					if self.board[x+1][y+1] < 20 and self.board[x+1][y+1] != 0:
+					if arr[x+1][y+1] < 20 and arr[x+1][y+1] != 0:
 						moves.append(self.coordToStandard(y+1, x+1))
 		
 		return moves
 
-	def getAllBishopMoves(self, x, y, isW):		#to refactor if wanted on one while (with cond has To Continue Checking top right for ex)
+	def getAllBishopMoves(self, x, y, isW, arr="default"):		#to refactor if wanted on one while (with cond has To Continue Checking top right for ex)
+		if arr == "default":
+			arr = self.board
 		moves = []
 		tx = x
 		ty = y
@@ -232,11 +236,11 @@ class Board:
 			tx+=1
 			ty-=1
 			#black encounter black or white encounter white
-			if (self.board[tx][ty] > 20 and not isW) or (self.board[tx][ty] > 10 and self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and isW):
+			if (arr[tx][ty] > 20 and not isW) or (arr[tx][ty] > 10 and arr[tx][ty] < 20 and arr[tx][ty] != 0 and isW):
 				break
 			else:
 				moves.append(self.coordToStandard(ty, tx))
-				if (self.board[tx][ty] > 20 and isW) or (self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and not isW):
+				if (arr[tx][ty] > 20 and isW) or (arr[tx][ty] < 20 and arr[tx][ty] != 0 and not isW):
 					break
 		tx = x
 		ty = y
@@ -245,11 +249,11 @@ class Board:
 			tx+=1
 			ty+=1
 			#black encounter black or white encounter white
-			if (self.board[tx][ty] > 20 and not isW) or (self.board[tx][ty] > 10 and self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and isW):
+			if (arr[tx][ty] > 20 and not isW) or (arr[tx][ty] > 10 and arr[tx][ty] < 20 and arr[tx][ty] != 0 and isW):
 				break
 			else:
 				moves.append(self.coordToStandard(ty, tx))
-				if (self.board[tx][ty] > 20 and isW) or (self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and not isW):
+				if (arr[tx][ty] > 20 and isW) or (arr[tx][ty] < 20 and arr[tx][ty] != 0 and not isW):
 					break
 		tx = x
 		ty = y
@@ -258,11 +262,11 @@ class Board:
 			tx-=1
 			ty+=1
 			#black encounter black or white encounter white
-			if (self.board[tx][ty] > 20 and not isW) or (self.board[tx][ty] > 10 and self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and isW):
+			if (arr[tx][ty] > 20 and not isW) or (arr[tx][ty] > 10 and arr[tx][ty] < 20 and arr[tx][ty] != 0 and isW):
 				break
 			else:
 				moves.append(self.coordToStandard(ty, tx))
-				if (self.board[tx][ty] > 20 and isW) or (self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and not isW):
+				if (arr[tx][ty] > 20 and isW) or (arr[tx][ty] < 20 and arr[tx][ty] != 0 and not isW):
 					break
 		tx = x
 		ty = y
@@ -271,18 +275,20 @@ class Board:
 			tx-=1
 			ty-=1
 			#black encounter black or white encounter white
-			if (self.board[tx][ty] > 20 and not isW) or (self.board[tx][ty] > 10 and self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and isW):
+			if (arr[tx][ty] > 20 and not isW) or (arr[tx][ty] > 10 and arr[tx][ty] < 20 and arr[tx][ty] != 0 and isW):
 				break
 			else:
 				moves.append(self.coordToStandard(ty, tx))
-				if (self.board[tx][ty] > 20 and isW) or (self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and not isW):
+				if (arr[tx][ty] > 20 and isW) or (arr[tx][ty] < 20 and arr[tx][ty] != 0 and not isW):
 					break
 		tx = x
 		ty = y
 
 		return moves
 
-	def getAllRookMoves(self, x, y, isW):	#refactor same as bishop -> only one while
+	def getAllRookMoves(self, x, y, isW, arr="default"):	#refactor same as bishop -> only one while
+		if arr == "default":
+			arr = self.board
 		moves = []
 		tx = x
 		ty = y
@@ -290,45 +296,45 @@ class Board:
 		#down
 		while tx+1 <= 7:
 			tx += 1
-			if (self.board[tx][ty] > 20 and not isW) or (self.board[tx][ty] > 10 and self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and isW):
+			if (arr[tx][ty] > 20 and not isW) or (arr[tx][ty] > 10 and arr[tx][ty] < 20 and arr[tx][ty] != 0 and isW):
 				break
 			else:
 				moves.append(self.coordToStandard(ty, tx))
-				# and self.board[tx][ty] != 0
-				if (self.board[tx][ty] > 20 and isW) or (self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and not isW):
+				# and arr[tx][ty] != 0
+				if (arr[tx][ty] > 20 and isW) or (arr[tx][ty] < 20 and arr[tx][ty] != 0 and not isW):
 					break
 		tx = x
 		ty = y
 		#right
 		while ty+1 <= 7:
 			ty += 1
-			if (self.board[tx][ty] > 20 and not isW) or (self.board[tx][ty] > 10 and self.board[tx][ty] < 20  and self.board[tx][ty] != 0 and isW):
+			if (arr[tx][ty] > 20 and not isW) or (arr[tx][ty] > 10 and arr[tx][ty] < 20  and arr[tx][ty] != 0 and isW):
 				break
 			else:
 				moves.append(self.coordToStandard(ty, tx))
-				if (self.board[tx][ty] > 20 and isW) or (self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and not isW):
+				if (arr[tx][ty] > 20 and isW) or (arr[tx][ty] < 20 and arr[tx][ty] != 0 and not isW):
 					break
 		tx = x
 		ty = y
 		#up
 		while tx-1 >= 0:
 			tx -= 1
-			if (self.board[tx][ty] > 20 and not isW) or (self.board[tx][ty] > 10 and self.board[tx][ty] < 20  and self.board[tx][ty] != 0 and isW):
+			if (arr[tx][ty] > 20 and not isW) or (arr[tx][ty] > 10 and arr[tx][ty] < 20  and arr[tx][ty] != 0 and isW):
 				break
 			else:
 				moves.append(self.coordToStandard(ty, tx))
-				if (self.board[tx][ty] > 20 and isW) or (self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and not isW):
+				if (arr[tx][ty] > 20 and isW) or (arr[tx][ty] < 20 and arr[tx][ty] != 0 and not isW):
 					break
 		tx = x
 		ty = y
 		#left
 		while ty-1 >= 0:
 			ty -= 1
-			if (self.board[tx][ty] > 20 and not isW) or (self.board[tx][ty] > 10 and self.board[tx][ty] < 20  and self.board[tx][ty] != 0 and isW):
+			if (arr[tx][ty] > 20 and not isW) or (arr[tx][ty] > 10 and arr[tx][ty] < 20  and arr[tx][ty] != 0 and isW):
 				break
 			else:
 				moves.append(self.coordToStandard(ty, tx))
-				if (self.board[tx][ty] > 20 and isW) or (self.board[tx][ty] < 20 and self.board[tx][ty] != 0 and not isW):
+				if (arr[tx][ty] > 20 and isW) or (arr[tx][ty] < 20 and arr[tx][ty] != 0 and not isW):
 					break
 		tx = x
 		ty = y
@@ -336,60 +342,68 @@ class Board:
 		return moves
 
 
-	def getAllQueenMoves(self, x, y, isW):
-		return self.getAllRookMoves(x, y, isW)+self.getAllBishopMoves(x, y, isW)
+	def getAllQueenMoves(self, x, y, isW, arr="default"):
+		if arr == "default":
+			return self.getAllRookMoves(x, y, isW)+self.getAllBishopMoves(x, y, isW)
+		else:
+			return self.getAllRookMoves(x, y, isW)+self.getAllBishopMoves(x, y, isW, b)
 
-	def getAllKnightMoves(self, x, y, isW):
+
+	def getAllKnightMoves(self, x, y, isW, arr="default"):
+		if arr == "default":
+			arr = self.board
 		moves = []
-		if self.isInBoard(x+2, y-1) and self.isInBoard(x+2, y-1) and (self.board[x+2][y-1] == 0 or (isW and self.isBlackPiece(x+2, y-1)) or not isW and self.isWhitePiece(x+2, y-1)):
+		if self.isInBoard(x+2, y-1) and self.isInBoard(x+2, y-1) and (arr[x+2][y-1] == 0 or (isW and self.isBlackPiece(x+2, y-1)) or not isW and self.isWhitePiece(x+2, y-1)):
 			moves.append(self.coordToStandard(y-1, x+2))
-		if self.isInBoard(x+2, y+1) and self.isInBoard(x+2, y+1) and (self.board[x+2][y+1] == 0 or (isW and self.isBlackPiece(x+2, y+1)) or not isW and self.isWhitePiece(x+2, y+1)):
+		if self.isInBoard(x+2, y+1) and self.isInBoard(x+2, y+1) and (arr[x+2][y+1] == 0 or (isW and self.isBlackPiece(x+2, y+1)) or not isW and self.isWhitePiece(x+2, y+1)):
 			moves.append(self.coordToStandard(y+1, x+2))
-		if self.isInBoard(x-2, y-1) and self.isInBoard(x-2, y-1) and (self.board[x-2][y-1] == 0 or (isW and self.isBlackPiece(x-2, y-1)) or not isW and self.isWhitePiece(x-2, y-1)):
+		if self.isInBoard(x-2, y-1) and self.isInBoard(x-2, y-1) and (arr[x-2][y-1] == 0 or (isW and self.isBlackPiece(x-2, y-1)) or not isW and self.isWhitePiece(x-2, y-1)):
 			moves.append(self.coordToStandard(y-1, x-2))
-		if self.isInBoard(x-2, y+1) and self.isInBoard(x-2, y+1) and (self.board[x-2][y+1] == 0 or (isW and self.isBlackPiece(x-2, y+1)) or not isW and self.isWhitePiece(x-2, y+1)):
+		if self.isInBoard(x-2, y+1) and self.isInBoard(x-2, y+1) and (arr[x-2][y+1] == 0 or (isW and self.isBlackPiece(x-2, y+1)) or not isW and self.isWhitePiece(x-2, y+1)):
 			moves.append(self.coordToStandard(y+1, x-2))
-		if self.isInBoard(x+1, y-2) and self.isInBoard(x+1, y-2) and (self.board[x+1][y-2] == 0 or (isW and self.isBlackPiece(x+1, y-2)) or not isW and self.isWhitePiece(x+1, y-2)):
+		if self.isInBoard(x+1, y-2) and self.isInBoard(x+1, y-2) and (arr[x+1][y-2] == 0 or (isW and self.isBlackPiece(x+1, y-2)) or not isW and self.isWhitePiece(x+1, y-2)):
 			moves.append(self.coordToStandard(y-2, x+1))
-		if self.isInBoard(x+1, y+2) and self.isInBoard(x+1, y+2) and (self.board[x+1][y+2] == 0 or (isW and self.isBlackPiece(x+1, y+2)) or not isW and self.isWhitePiece(x+1, y+2)):
+		if self.isInBoard(x+1, y+2) and self.isInBoard(x+1, y+2) and (arr[x+1][y+2] == 0 or (isW and self.isBlackPiece(x+1, y+2)) or not isW and self.isWhitePiece(x+1, y+2)):
 			moves.append(self.coordToStandard(y+2, x+1))
-		if self.isInBoard(x-1, y-2) and self.isInBoard(x-1, y-2) and (self.board[x-1][y-2] == 0 or (isW and self.isBlackPiece(x-1, y-2)) or not isW and self.isWhitePiece(x-1, y-2)):
+		if self.isInBoard(x-1, y-2) and self.isInBoard(x-1, y-2) and (arr[x-1][y-2] == 0 or (isW and self.isBlackPiece(x-1, y-2)) or not isW and self.isWhitePiece(x-1, y-2)):
 			moves.append(self.coordToStandard(y-2, x-1))
-		if self.isInBoard(x-1, y+2) and self.isInBoard(x-1, y+2) and (self.board[x-1][y+2] == 0 or (isW and self.isBlackPiece(x-1, y+2)) or not isW and self.isWhitePiece(x-1, y+2)):
+		if self.isInBoard(x-1, y+2) and self.isInBoard(x-1, y+2) and (arr[x-1][y+2] == 0 or (isW and self.isBlackPiece(x-1, y+2)) or not isW and self.isWhitePiece(x-1, y+2)):
 			moves.append(self.coordToStandard(y+2, x-1))
 
 		return moves
 
-	def getAllKingMoves(self, x, y, isW):
+	def getAllKingMoves(self, x, y, isW, arr="default"):
+		if arr == "default":
+			arr = self.board
 		moves = []
-		if self.isInBoard(x+1, y) and (self.board[x+1][y] == 0 or (isW and self.isBlackPiece(x+1, y)) or not isW and self.isWhitePiece(x+1, y)):
+		if self.isInBoard(x+1, y) and (arr[x+1][y] == 0 or (isW and self.isBlackPiece(x+1, y)) or not isW and self.isWhitePiece(x+1, y)):
 			moves.append(self.coordToStandard(y, x+1))
-		if self.isInBoard(x-1, y) and (self.board[x-1][y] == 0 or (isW and self.isBlackPiece(x-1, y)) or not isW and self.isWhitePiece(x-1, y)):
+		if self.isInBoard(x-1, y) and (arr[x-1][y] == 0 or (isW and self.isBlackPiece(x-1, y)) or not isW and self.isWhitePiece(x-1, y)):
 			moves.append(self.coordToStandard(y, x-1))
-		if self.isInBoard(x, y+1) and (self.board[x][y+1] == 0 or (isW and self.isBlackPiece(x, y+1)) or not isW and self.isWhitePiece(x, y+1)):
+		if self.isInBoard(x, y+1) and (arr[x][y+1] == 0 or (isW and self.isBlackPiece(x, y+1)) or not isW and self.isWhitePiece(x, y+1)):
 			moves.append(self.coordToStandard(y+1, x))
-		if self.isInBoard(x, y-1) and (self.board[x][y-1] == 0 or (isW and self.isBlackPiece(x, y-1)) or not isW and self.isWhitePiece(x, y-1)):
+		if self.isInBoard(x, y-1) and (arr[x][y-1] == 0 or (isW and self.isBlackPiece(x, y-1)) or not isW and self.isWhitePiece(x, y-1)):
 			moves.append(self.coordToStandard(y-1, x))
-		if self.isInBoard(x+1, y+1) and (self.board[x+1][y+1] == 0 or (isW and self.isBlackPiece(x+1, y+1)) or not isW and self.isWhitePiece(x+1, y+1)):
+		if self.isInBoard(x+1, y+1) and (arr[x+1][y+1] == 0 or (isW and self.isBlackPiece(x+1, y+1)) or not isW and self.isWhitePiece(x+1, y+1)):
 			moves.append(self.coordToStandard(y+1, x+1))
-		if self.isInBoard(x+1, y-1) and (self.board[x+1][y-1] == 0 or (isW and self.isBlackPiece(x+1, y-1)) or not isW and self.isWhitePiece(x+1, y-1)):
+		if self.isInBoard(x+1, y-1) and (arr[x+1][y-1] == 0 or (isW and self.isBlackPiece(x+1, y-1)) or not isW and self.isWhitePiece(x+1, y-1)):
 			moves.append(self.coordToStandard(y-1, x+1))
-		if self.isInBoard(x-1, y+1) and (self.board[x-1][y+1] == 0 or (isW and self.isBlackPiece(x-1, y+1)) or not isW and self.isWhitePiece(x-1, y+1)):
+		if self.isInBoard(x-1, y+1) and (arr[x-1][y+1] == 0 or (isW and self.isBlackPiece(x-1, y+1)) or not isW and self.isWhitePiece(x-1, y+1)):
 			moves.append(self.coordToStandard(y+1, x-1))
-		if self.isInBoard(x-1, y-1) and (self.board[x-1][y-1] == 0 or (isW and self.isBlackPiece(x-1, y-1)) or not isW and self.isWhitePiece(x-1, y-1)):
+		if self.isInBoard(x-1, y-1) and (arr[x-1][y-1] == 0 or (isW and self.isBlackPiece(x-1, y-1)) or not isW and self.isWhitePiece(x-1, y-1)):
 			moves.append(self.coordToStandard(y-1, x-1))
 
 		if isW:
 			if not self.wKingMoved and x == 7 and y == 4:
-				if not self.wRooksMoved[0] and self.board[x][y-1] == 0 and self.board[x][y-2] == 0:
+				if not self.wRooksMoved[0] and arr[x][y-1] == 0 and arr[x][y-2] == 0:
 					moves.append(self.coordToStandard(y-2, x))
-				if not self.wRooksMoved[1] and self.board[x][y+1] == 0 and self.board[x][y+2] == 0:
+				if not self.wRooksMoved[1] and arr[x][y+1] == 0 and arr[x][y+2] == 0:
 					moves.append(self.coordToStandard(y+2, x))
 		else:
 			if not self.bKingMoved and  x == 0 and y == 4:
-				if not self.bRooksMoved[0] and self.board[x][y-1] == 0 and self.board[x][y-2] == 0:
+				if not self.bRooksMoved[0] and arr[x][y-1] == 0 and arr[x][y-2] == 0:
 					moves.append(self.coordToStandard(y-2, x))
-				if not self.bRooksMoved[1] and self.board[x][y+1] == 0 and self.board[x][y+2] == 0:
+				if not self.bRooksMoved[1] and arr[x][y+1] == 0 and arr[x][y+2] == 0:
 					moves.append(self.coordToStandard(y+2, x))
 
 
@@ -445,7 +459,7 @@ class Board:
 
 
 		king = self.whereIsKing(isW)
-		moves = {
+		movesForEnnemy = {
 
 		}
 		a = 0
@@ -455,17 +469,17 @@ class Board:
 			for j in range(8):
 				p = self.board[i][j]+a
 				if p == 11:	#pawn
-					moves[self.coordToStandard(j, i)] = self.getAllPawnMoves(i, j, player % 2 != 0)
+					movesForEnnemy[self.coordToStandard(j, i)] = self.getAllPawnMoves(i, j, player % 2 != 0)
 				elif p == 13:
-					moves[self.coordToStandard(j, i)] = self.getAllKnightMoves(i, j, player % 2 != 0)
+					movesForEnnemy[self.coordToStandard(j, i)] = self.getAllKnightMoves(i, j, player % 2 != 0)
 				elif p == 14:
-					moves[self.coordToStandard(j, i)] = self.getAllBishopMoves(i, j, player % 2 != 0)
+					movesForEnnemy[self.coordToStandard(j, i)] = self.getAllBishopMoves(i, j, player % 2 != 0)
 				elif p == 15:
-					moves[self.coordToStandard(j, i)] = self.getAllRookMoves(i, j, player % 2 != 0)
+					movesForEnnemy[self.coordToStandard(j, i)] = self.getAllRookMoves(i, j, player % 2 != 0)
 				elif p == 19:
-					moves[self.coordToStandard(j, i)] = self.getAllQueenMoves(i, j, player % 2 != 0)
+					movesForEnnemy[self.coordToStandard(j, i)] = self.getAllQueenMoves(i, j, player % 2 != 0)
 				elif p == 12:
-					moves[self.coordToStandard(j, i)] = self.getAllKingMoves(i, j, player % 2 != 0)
+					movesForEnnemy[self.coordToStandard(j, i)] = self.getAllKingMoves(i, j, player % 2 != 0)
 
 
 		#rook / bishop don't work (block it with another piece or take it) 	!!!
@@ -484,8 +498,18 @@ class Board:
 		"""
 
 
+
+		"""
+		check if attack can be avoided -> check is attacker is menaced if yes add move po possibilities
+
+
+		"""
+
+		#movesAllowed current player (the one that has to play) moves possibles
+		#moves
+
 		#position check (if case has a rook else rook moved)				!
-		if self.isAttacked(king[1], king[0], not isW, moves, self.board):
+		if self.isAttacked(king[1], king[0], not isW, movesForEnnemy, self.board):
 			b = deepcopy(self.board)
 			for key in movesAllowed.keys():
 				l = []
@@ -495,8 +519,37 @@ class Board:
 					b[coord2[0]][coord2[1]] = b[coord[0]][coord[1]]
 					b[coord[0]][coord[1]] = 0
 					kingN = self.whereIsKing(isW, b)
-					moves = self.getM(player, b)
-					if not self.isAttacked(kingN[1], kingN[0], not isW, moves, b):
+					movesForEnnemy = {
+
+					}
+					a = 0
+					if player % 2 == 0:	#to get the correct pieces (if black a = -10)
+						a = -10
+					for x in range(8):
+						for y in range(8):
+							p = b[x][y]+a
+							#print(p)
+							if p == 11:	#pawn
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllPawnMoves(x, y, player % 2 != 0, b)
+							elif p == 13:
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllKnightMoves(x, y, player % 2 != 0, b)
+							elif p == 14:
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllBishopMoves(x, y, player % 2 != 0, b)
+							elif p == 15:
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllRookMoves(x, y, player % 2 != 0, b)
+							elif p == 19:
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllQueenMoves(x, y, player % 2 != 0, b)
+							elif p == 12:
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllKingMoves(x, y, player % 2 != 0, b)
+					
+					
+					
+					#print(not self.isAttacked(kingN[1], kingN[0], not isW, movesForEnnemy, b), movesForEnnemy)
+					if not self.isAttacked(kingN[1], kingN[0], not isW, movesForEnnemy, b):
+						#print(kingN[0], kingN[1])
+						if kingN[0] == 6 and kingN[1] == 5:
+							#print(movesForEnnemy)
+							pass
 						l.append(movesAllowed[key][i])
 					b = deepcopy(self.board)
 				movesAllowed[key] = l
@@ -504,33 +557,3 @@ class Board:
 
 		return movesAllowed
 			
-
-	def getM(self, player, arr):
-		isW = True
-		if player % 2 != 0:
-			isW = False
-
-
-		king = self.whereIsKing(isW)
-		moves = {
-
-		}
-		a = 0
-		if player % 2 == 0:	#to get the correct pieces (if black a = -10)
-			a = -10
-		for i in range(8):
-			for j in range(8):
-				p = arr[i][j]+a
-				if p == 11:	#pawn
-					moves[self.coordToStandard(j, i)] = self.getAllPawnMoves(i, j, player % 2 != 0)
-				elif p == 13:
-					moves[self.coordToStandard(j, i)] = self.getAllKnightMoves(i, j, player % 2 != 0)
-				elif p == 14:
-					moves[self.coordToStandard(j, i)] = self.getAllBishopMoves(i, j, player % 2 != 0)
-				elif p == 15:
-					moves[self.coordToStandard(j, i)] = self.getAllRookMoves(i, j, player % 2 != 0)
-				elif p == 19:
-					moves[self.coordToStandard(j, i)] = self.getAllQueenMoves(i, j, player % 2 != 0)
-				elif p == 12:
-					moves[self.coordToStandard(j, i)] = self.getAllKingMoves(i, j, player % 2 != 0)
-		return moves
