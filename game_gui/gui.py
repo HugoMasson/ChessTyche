@@ -74,8 +74,6 @@ class Gui():
 
 	def run(self):
 		running = True
-		toRefresh = False
-		self.draw()
 		while running:	
 			for event in pygame.event.get():
 				toRefresh = True
@@ -109,10 +107,8 @@ class Gui():
 					
 				if event.type == pygame.QUIT:
 					running = False
+				self.draw()
 
-				if toRefresh:
-					self.draw()
-					toRefresh = False
 			pygame.display.update()
 		
 

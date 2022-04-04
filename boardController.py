@@ -25,7 +25,7 @@ class Board:
 			25:"assets/images/black_rook.png",
 			29:"assets/images/black_queen.png",
 		}
-		"""
+		
 		self.board = [
 			[25,23,24,29,22,24,23,25],
 			[21,21,21,21,21,21,21,21],
@@ -38,15 +38,16 @@ class Board:
 		]
 		"""
 		self.board = [
-			[25,00,23,24,22,00,00,00],
+			[00,00,00,00,22,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[00,00,21,00,00,00,00,00],
+			[00,00,00,29,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[00,00,00,00,00,00,11,00],
-			[15,00,00,00,12,14,13,00],
+			[00,00,00,00,00,00,00,25],
+			[00,00,00,00,00,12,00,00],
 		]
+		"""
 
 	def whereIsKing(self, isW, arr="default"):
 		if arr == "default":
@@ -69,11 +70,15 @@ class Board:
 	def isBlackTurn(self):
 		return self.turn % 2 == 0
 
-	def isWhitePiece(self, x, y):
-		return self.board[x][y] < 20 and self.board[x][y] != 0
+	def isWhitePiece(self, x, y, arr="default"):
+		if arr == "default":
+			arr = self.board
+		return arr[x][y] < 20 and arr[x][y] != 0
 
-	def isBlackPiece(self, x, y):
-		return self.board[x][y] > 20
+	def isBlackPiece(self, x, y, arr="default"):
+		if arr == "default":
+			arr = self.board
+		return arr[x][y] > 20
 
 	def nextTurn(self):
 		self.turn += 1
@@ -141,6 +146,14 @@ class Board:
 				elif self.board[x][y] == 25 and x == 0 and y == 7:
 					self.bRooksMoved[1] = True
 					
+				#promotions
+				if self.board[x][y] == 11:
+					if x2 == 0:
+						self.board[x][y] = 19
+				elif self.board[x][y] == 21:
+					if x2 == 7:
+						self.board[x][y] = 29
+
 				self.board[x2][y2] = self.board[x][y]
 				self.board[x][y] = 0
 				return True
@@ -346,33 +359,48 @@ class Board:
 		if arr == "default":
 			return self.getAllRookMoves(x, y, isW)+self.getAllBishopMoves(x, y, isW)
 		else:
-			return self.getAllRookMoves(x, y, isW)+self.getAllBishopMoves(x, y, isW, b)
+			return self.getAllRookMoves(x, y, isW, arr)+self.getAllBishopMoves(x, y, isW, arr)
 
 
 	def getAllKnightMoves(self, x, y, isW, arr="default"):
 		if arr == "default":
 			arr = self.board
 		moves = []
-		if self.isInBoard(x+2, y-1) and self.isInBoard(x+2, y-1) and (arr[x+2][y-1] == 0 or (isW and self.isBlackPiece(x+2, y-1)) or not isW and self.isWhitePiece(x+2, y-1)):
+		#	5, 4 white knight -> 4, 2 black king
+		if self.isInBoard(x+2, y-1) and (arr[x+2][y-1] == 0 or (isW and self.isBlackPiece(x+2, y-1, arr)) or not isW and self.isWhitePiece(x+2, y-1, arr)):
 			moves.append(self.coordToStandard(y-1, x+2))
-		if self.isInBoard(x+2, y+1) and self.isInBoard(x+2, y+1) and (arr[x+2][y+1] == 0 or (isW and self.isBlackPiece(x+2, y+1)) or not isW and self.isWhitePiece(x+2, y+1)):
+		if self.isInBoard(x+2, y+1) and (arr[x+2][y+1] == 0 or (isW and self.isBlackPiece(x+2, y+1, arr)) or not isW and self.isWhitePiece(x+2, y+1, arr)):
 			moves.append(self.coordToStandard(y+1, x+2))
-		if self.isInBoard(x-2, y-1) and self.isInBoard(x-2, y-1) and (arr[x-2][y-1] == 0 or (isW and self.isBlackPiece(x-2, y-1)) or not isW and self.isWhitePiece(x-2, y-1)):
+		if self.isInBoard(x-2, y-1) and (arr[x-2][y-1] == 0 or (isW and self.isBlackPiece(x-2, y-1, arr)) or not isW and self.isWhitePiece(x-2, y-1, arr)):
 			moves.append(self.coordToStandard(y-1, x-2))
-		if self.isInBoard(x-2, y+1) and self.isInBoard(x-2, y+1) and (arr[x-2][y+1] == 0 or (isW and self.isBlackPiece(x-2, y+1)) or not isW and self.isWhitePiece(x-2, y+1)):
+		if self.isInBoard(x-2, y+1) and (arr[x-2][y+1] == 0 or (isW and self.isBlackPiece(x-2, y+1, arr)) or not isW and self.isWhitePiece(x-2, y+1, arr)):
 			moves.append(self.coordToStandard(y+1, x-2))
-		if self.isInBoard(x+1, y-2) and self.isInBoard(x+1, y-2) and (arr[x+1][y-2] == 0 or (isW and self.isBlackPiece(x+1, y-2)) or not isW and self.isWhitePiece(x+1, y-2)):
+		if self.isInBoard(x+1, y-2) and (arr[x+1][y-2] == 0 or (isW and self.isBlackPiece(x+1, y-2, arr)) or not isW and self.isWhitePiece(x+1, y-2, arr)):
 			moves.append(self.coordToStandard(y-2, x+1))
-		if self.isInBoard(x+1, y+2) and self.isInBoard(x+1, y+2) and (arr[x+1][y+2] == 0 or (isW and self.isBlackPiece(x+1, y+2)) or not isW and self.isWhitePiece(x+1, y+2)):
+		if self.isInBoard(x+1, y+2) and (arr[x+1][y+2] == 0 or (isW and self.isBlackPiece(x+1, y+2, arr)) or not isW and self.isWhitePiece(x+1, y+2, arr)):
 			moves.append(self.coordToStandard(y+2, x+1))
-		if self.isInBoard(x-1, y-2) and self.isInBoard(x-1, y-2) and (arr[x-1][y-2] == 0 or (isW and self.isBlackPiece(x-1, y-2)) or not isW and self.isWhitePiece(x-1, y-2)):
-			moves.append(self.coordToStandard(y-2, x-1))
-		if self.isInBoard(x-1, y+2) and self.isInBoard(x-1, y+2) and (arr[x-1][y+2] == 0 or (isW and self.isBlackPiece(x-1, y+2)) or not isW and self.isWhitePiece(x-1, y+2)):
+		if self.isInBoard(x-1, y-2) and (arr[x-1][y-2] == 0 or (isW and self.isBlackPiece(x-1, y-2, arr)) or not isW and self.isWhitePiece(x-1, y-2, arr)):
+			moves.append(self.coordToStandard(y-2, x-1))	
+		if self.isInBoard(x-1, y+2) and (arr[x-1][y+2] == 0 or (isW and self.isBlackPiece(x-1, y+2, arr)) or not isW and self.isWhitePiece(x-1, y+2, arr)):
 			moves.append(self.coordToStandard(y+2, x-1))
-
 		return moves
 
-	def getAllKingMoves(self, x, y, isW, arr="default"):
+
+	def getAllKingMoves(self, x, y, isW, movesEnnemy=None, arr="default"):
+
+
+		"""
+			1/ Rock have many issues
+				- should not allow a rock if no rook (taken or not in the board)
+				- verify if isAttacked is correctly applied
+				- 
+	
+			2/ King can't go next to a king (or if do it game over it's a give up move)
+
+
+		"""
+
+
 		if arr == "default":
 			arr = self.board
 		moves = []
@@ -393,19 +421,53 @@ class Board:
 		if self.isInBoard(x-1, y-1) and (arr[x-1][y-1] == 0 or (isW and self.isBlackPiece(x-1, y-1)) or not isW and self.isWhitePiece(x-1, y-1)):
 			moves.append(self.coordToStandard(y-1, x-1))
 
-		if isW:
+		if isW:	#one of rock fixes is to be added here
 			if not self.wKingMoved and x == 7 and y == 4:
-				if not self.wRooksMoved[0] and arr[x][y-1] == 0 and arr[x][y-2] == 0:
+				if not self.wRooksMoved[0] and arr[x][y-1] == 0 and arr[x][y-2] == 0 and arr[7][0] == 15:
 					moves.append(self.coordToStandard(y-2, x))
-				if not self.wRooksMoved[1] and arr[x][y+1] == 0 and arr[x][y+2] == 0:
+				if not self.wRooksMoved[1] and arr[x][y+1] == 0 and arr[x][y+2] == 0 and arr[7][7] == 15:
 					moves.append(self.coordToStandard(y+2, x))
 		else:
 			if not self.bKingMoved and  x == 0 and y == 4:
-				if not self.bRooksMoved[0] and arr[x][y-1] == 0 and arr[x][y-2] == 0:
+				if not self.bRooksMoved[0] and arr[x][y-1] == 0 and arr[x][y-2] == 0 and arr[0][0] == 25:
 					moves.append(self.coordToStandard(y-2, x))
-				if not self.bRooksMoved[1] and arr[x][y+1] == 0 and arr[x][y+2] == 0:
+				if not self.bRooksMoved[1] and arr[x][y+1] == 0 and arr[x][y+2] == 0 and arr[0][7] == 25:
 					moves.append(self.coordToStandard(y+2, x))
 
+		if movesEnnemy != None:
+			result = []
+			b = deepcopy(self.board)
+			for i in range(len(moves)):
+				#print(moves[i], end="  ")
+				m = self.standardToCoord(moves[i])
+				if not self.isAttacked(m[1], m[0], isW, movesEnnemy, self.board):
+					b[m[1]][m[0]] = b[x][y];
+					b[x][y] = 0;
+					movesForEnnemy = {
+
+					}
+					a = 0
+					if not isW % 2 == 0:	#to get the correct pieces (if black a = -10)
+						a = -10
+					for x in range(8):
+						for y in range(8):
+							p = b[x][y]+a
+							if p == 11:	#pawn
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllPawnMoves(x, y, isW)
+							elif p == 13:
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllKnightMoves(x, y, isW)
+							elif p == 14:
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllBishopMoves(x, y, isW)
+							elif p == 15:
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllRookMoves(x, y, isW)
+							elif p == 19:
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllQueenMoves(x, y, isW)
+							elif p == 12:
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllKingMoves(x, y, isW)
+
+					if not self.isAttacked(m[1], m[0], isW, movesForEnnemy, b):
+						result.append(moves[i])
+			return result
 
 
 		return moves
@@ -416,43 +478,8 @@ class Board:
 
 	#return list of all the possible moves for a position
 	def getAllMovesPossible(self, player):
-		#ex : { "a1": ["a2", "a3" ...], "c4": ["b3" ...] }
-		movesAllowed = {
 
-		}
-		a = 0
-		if player % 2 != 0:	#to get the correct pieces (if black a = -10)
-			a = -10
-		for i in range(8):
-			for j in range(8):
-				p = self.board[i][j]+a
-				if p == 11:	#pawn
-					movesAllowed[self.coordToStandard(j, i)] = self.getAllPawnMoves(i, j, player % 2 == 0)
-				elif p == 13:
-					movesAllowed[self.coordToStandard(j, i)] = self.getAllKnightMoves(i, j, player % 2 == 0)
-				elif p == 14:
-					movesAllowed[self.coordToStandard(j, i)] = self.getAllBishopMoves(i, j, player % 2 == 0)
-				elif p == 15:
-					movesAllowed[self.coordToStandard(j, i)] = self.getAllRookMoves(i, j, player % 2 == 0)
-				elif p == 19:
-					movesAllowed[self.coordToStandard(j, i)] = self.getAllQueenMoves(i, j, player % 2 == 0)
-				elif p == 12:
-					movesAllowed[self.coordToStandard(j, i)] = self.getAllKingMoves(i, j, player % 2 == 0)
-
-	
-		"""
-		detect a check and trim movesAllowed to the legals moves (to avoid check)
-		+++
-		>if king under attack from other color
-			>try all pos for king color 	(rocks not allowed -> king x+/-2 y== is a rock)
-			>if pos result in no check keep 
-			>else delete
-		
-		+++
-		if 0 moves possible checkmate (while check)
-		if 0 moves possible pat (while not in check)
-		"""
-
+		underAtt = False
 		isW = True
 		if player % 2 != 0:
 			isW = False
@@ -482,34 +509,34 @@ class Board:
 					movesForEnnemy[self.coordToStandard(j, i)] = self.getAllKingMoves(i, j, player % 2 != 0)
 
 
-		#rook / bishop don't work (block it with another piece or take it) 	!!!
-		#rock is proposed even when rook is not on board add a BS
 
+		#ex : { "a1": ["a2", "a3" ...], "c4": ["b3" ...] }
+		movesAllowed = {
 
-		"""
-		logic:
-			keep track of what piece is the attacker
-			if one of the tested move is a take of attaker -> add move
-			or if one of the tested move is on the path of he attacker (if attacker is rook / bishop / queen)
-				store var of a redo of calcul of the piece with new pos (with move that block path)
-				if now attacker is still attacking cut move
-				else add move (bcs move cut the path to the king)
-
-		"""
-
-
-
-		"""
-		check if attack can be avoided -> check is attacker is menaced if yes add move po possibilities
-
-
-		"""
-
-		#movesAllowed current player (the one that has to play) moves possibles
-		#moves
+		}
+		a = 0
+		if player % 2 != 0:	#to get the correct pieces (if black a = -10)
+			a = -10
+		for i in range(8):
+			for j in range(8):
+				p = self.board[i][j]+a
+				if p == 11:	#pawn
+					movesAllowed[self.coordToStandard(j, i)] = self.getAllPawnMoves(i, j, player % 2 == 0)
+				elif p == 13:
+					movesAllowed[self.coordToStandard(j, i)] = self.getAllKnightMoves(i, j, player % 2 == 0)
+				elif p == 14:
+					movesAllowed[self.coordToStandard(j, i)] = self.getAllBishopMoves(i, j, player % 2 == 0)
+				elif p == 15:
+					movesAllowed[self.coordToStandard(j, i)] = self.getAllRookMoves(i, j, player % 2 == 0)
+				elif p == 19:
+					movesAllowed[self.coordToStandard(j, i)] = self.getAllQueenMoves(i, j, player % 2 == 0)
+				elif p == 12:
+					movesAllowed[self.coordToStandard(j, i)] = self.getAllKingMoves(i, j, player % 2 == 0, movesForEnnemy)
 
 		#position check (if case has a rook else rook moved)				!
 		if self.isAttacked(king[1], king[0], not isW, movesForEnnemy, self.board):
+			underAtt = True
+			#print("Check")
 			b = deepcopy(self.board)
 			for key in movesAllowed.keys():
 				l = []
@@ -540,20 +567,22 @@ class Board:
 							elif p == 19:
 								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllQueenMoves(x, y, player % 2 != 0, b)
 							elif p == 12:
-								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllKingMoves(x, y, player % 2 != 0, b)
-					
+								movesForEnnemy[self.coordToStandard(y, x)] = self.getAllKingMoves(x, y, player % 2 != 0, movesForEnnemy, b)
 					
 					
 					#print(not self.isAttacked(kingN[1], kingN[0], not isW, movesForEnnemy, b), movesForEnnemy)
+
 					if not self.isAttacked(kingN[1], kingN[0], not isW, movesForEnnemy, b):
-						#print(kingN[0], kingN[1])
-						if kingN[0] == 6 and kingN[1] == 5:
-							#print(movesForEnnemy)
-							pass
+						#print(kingN[0], kingN[1],movesForEnnemy["e3"], coord, coord2)
 						l.append(movesAllowed[key][i])
 					b = deepcopy(self.board)
 				movesAllowed[key] = l
 
+		if not bool([a for a in movesAllowed.values() if a != []]):
+			if underAtt:
+				print("Checkmate")
+			else:
+				print("Pat")
 
 		return movesAllowed
 			
