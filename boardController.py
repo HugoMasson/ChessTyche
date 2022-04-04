@@ -38,14 +38,14 @@ class Board:
 		]
 		"""
 		self.board = [
-			[25,24,23,00,22,00,00,00],
+			[25,00,00,00,22,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[15,14,13,00,12,00,00,00],
+			[15,00,00,00,12,00,00,00],
 		]
 
 	def whereIsKing(self, isW, arr="default"):
@@ -469,7 +469,7 @@ class Board:
 
 
 		#rook / bishop don't work (block it with another piece or take it) 	!!!
-		#rock is proposed even when rook is not on board add a 
+		#rock is proposed even when rook is not on board add a BS
 
 
 		"""
@@ -495,6 +495,7 @@ class Board:
 					b[coord2[0]][coord2[1]] = b[coord[0]][coord[1]]
 					b[coord[0]][coord[1]] = 0
 					kingN = self.whereIsKing(isW, b)
+					moves = self.getM(player, b)
 					if not self.isAttacked(kingN[1], kingN[0], not isW, moves, b):
 						l.append(movesAllowed[key][i])
 					b = deepcopy(self.board)
@@ -504,3 +505,32 @@ class Board:
 		return movesAllowed
 			
 
+	def getM(self, player, arr):
+		isW = True
+		if player % 2 != 0:
+			isW = False
+
+
+		king = self.whereIsKing(isW)
+		moves = {
+
+		}
+		a = 0
+		if player % 2 == 0:	#to get the correct pieces (if black a = -10)
+			a = -10
+		for i in range(8):
+			for j in range(8):
+				p = arr[i][j]+a
+				if p == 11:	#pawn
+					moves[self.coordToStandard(j, i)] = self.getAllPawnMoves(i, j, player % 2 != 0)
+				elif p == 13:
+					moves[self.coordToStandard(j, i)] = self.getAllKnightMoves(i, j, player % 2 != 0)
+				elif p == 14:
+					moves[self.coordToStandard(j, i)] = self.getAllBishopMoves(i, j, player % 2 != 0)
+				elif p == 15:
+					moves[self.coordToStandard(j, i)] = self.getAllRookMoves(i, j, player % 2 != 0)
+				elif p == 19:
+					moves[self.coordToStandard(j, i)] = self.getAllQueenMoves(i, j, player % 2 != 0)
+				elif p == 12:
+					moves[self.coordToStandard(j, i)] = self.getAllKingMoves(i, j, player % 2 != 0)
+		return moves
