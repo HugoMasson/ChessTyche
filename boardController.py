@@ -41,7 +41,7 @@ class Board:
 			25:"assets/images/black_rook.png",
 			29:"assets/images/black_queen.png",
 		}
-		
+		"""
 		self.board = [
 			[25,23,24,29,22,24,23,25],
 			[21,21,21,21,21,21,21,21],
@@ -54,16 +54,16 @@ class Board:
 		]
 		"""
 		self.board = [
-			[00,00,22,00,00,00,00,00],
-			[00,00,29,00,00,00,00,00],
+			[00,00,22,00,00,00,00,21],
+			[00,00,21,00,00,25,00,00],
+			[00,00,00,00,00,00,00,00],
+			[00,00,19,00,00,00,00,00],
+			[00,00,15,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[00,00,00,00,00,00,00,00],
-			[00,00,00,00,21,00,00,00],
-			[00,00,00,00,00,00,00,00],
-			[00,00,15,00,12,00,00,00],
+			[00,00,00,00,12,00,00,00],
 		]
-		"""
+		
 	def getBoard(self):
 		return self.board
 	def getPieces(self):
@@ -134,13 +134,13 @@ class Board:
 		return False
 
 	def isPlaceable(self, piece, x, y, arr="default"):		#working
-		if arr == "default":
-			arr = self.board
-
-		if piece > 20 and arr[x][y] < 20:
-			return True
-		elif piece < 20 and piece > 0 and (arr[x][y] > 20 or arr[x][y] == 0):
-			return True
+		if self.isInBoard(x, y):
+			if arr == "default":
+				arr = self.board
+			if piece > 20 and arr[x][y] < 20:
+				return True
+			elif (piece < 20 and piece > 0 and arr[x][y] > 20 or  arr[x][y] == 0):
+				return True
 		return False 
 
 
@@ -154,9 +154,6 @@ class Board:
 				if m == target:
 					return True
 		return False
-
-		
-
 
 	def getAllPawnMoves(self, x, y, white, arr="default"):
 		if arr == "default":
@@ -182,7 +179,6 @@ class Board:
 				moves.append(self.coordToStandard(x+direction, y-1))
 		return moves
 
-
 	def getAllBishopMoves(self, x, y, white, arr="default"):	#working
 		if arr == "default":
 			arr = self.board
@@ -192,28 +188,28 @@ class Board:
 		count = 1
 		while tl or tr or bl or br:
 			if tl:
-				if x-count >= 0 and y-count >= 0 and self.isPlaceable(arr[x][y], x-count, y-count):
+				if x-count >= 0 and y-count >= 0 and self.isPlaceable(arr[x][y], x-count, y-count, arr):
 					moves.append(self.coordToStandard(x-count, y-count))
 					if self.getColor(arr[x-count][y-count]) == (not white):
 						tl = False
 				else:
 					tl = False
 			if tr:
-				if x-count >= 0 and y+count <= 7 and self.isPlaceable(arr[x][y], x-count, y+count):
+				if x-count >= 0 and y+count <= 7 and self.isPlaceable(arr[x][y], x-count, y+count, arr):
 					moves.append(self.coordToStandard(x-count, y+count))
 					if self.getColor(arr[x-count][y+count]) == (not white):
 						tr = False
 				else:
 					tr = False
 			if bl:
-				if x+count <= 7 and y-count >= 0 and self.isPlaceable(arr[x][y], x+count, y-count):
+				if x+count <= 7 and y-count >= 0 and self.isPlaceable(arr[x][y], x+count, y-count, arr):
 					moves.append(self.coordToStandard(x+count, y-count))
 					if self.getColor(arr[x+count][y-count]) == (not white):
 						bl = False
 				else:
 					bl = False
 			if br:
-				if x+count <= 7 and y+count <= 7 and self.isPlaceable(arr[x][y], x+count, y+count):
+				if x+count <= 7 and y+count <= 7 and self.isPlaceable(arr[x][y], x+count, y+count, arr):
 					moves.append(self.coordToStandard(x+count, y+count))
 					if self.getColor(arr[x+count][y+count]) == (not white):
 						br = False
@@ -231,7 +227,7 @@ class Board:
 		count = 1
 		while top or bot or left or right:
 			if left:
-				if y-count >= 0 and self.isPlaceable(arr[x][y], x, y-count):
+				if y-count >= 0 and self.isPlaceable(arr[x][y], x, y-count, arr):
 					moves.append(self.coordToStandard(x, y-count))
 					if self.getColor(arr[x][y-count]) == (not white):
 						left = False
@@ -239,21 +235,21 @@ class Board:
 					left = False
 
 			if right:
-				if y+count <= 7 and self.isPlaceable(arr[x][y], x, y+count):
+				if y+count <= 7 and self.isPlaceable(arr[x][y], x, y+count, arr):
 					moves.append(self.coordToStandard(x, y+count))
 					if self.getColor(arr[x][y+count]) == (not white):
 						right = False
 				else:
 					right = False
 			if top:
-				if x-count >= 0 and self.isPlaceable(arr[x][y], x-count, y):
+				if x-count >= 0 and self.isPlaceable(arr[x][y], x-count, y, arr):
 					moves.append(self.coordToStandard(x-count, y))
 					if self.getColor(arr[x-count][y]) == (not white):
 						top = False
 				else:
 					top = False
 			if bot:
-				if x+count <= 7 and self.isPlaceable(arr[x][y], x+count, y):
+				if x+count <= 7 and self.isPlaceable(arr[x][y], x+count, y, arr):
 					moves.append(self.coordToStandard(x+count, y))
 					if self.getColor(arr[x+count][y]) == (not white):
 						bot = False
@@ -272,21 +268,21 @@ class Board:
 			arr = self.board
 
 		moves = []
-		if self.isInBoard(x+2, y+1) and self.isPlaceable(arr[x][y], x+2, y+1):
+		if self.isInBoard(x+2, y+1) and self.isPlaceable(arr[x][y], x+2, y+1, arr):
 			moves.append(self.coordToStandard(x+2, y+1))
-		if self.isInBoard(x+2, y-1) and self.isPlaceable(arr[x][y], x+2, y-1):
+		if self.isInBoard(x+2, y-1) and self.isPlaceable(arr[x][y], x+2, y-1, arr):
 			moves.append(self.coordToStandard(x+2, y-1))
-		if self.isInBoard(x-2, y+1) and self.isPlaceable(arr[x][y], x-2, y+1):
+		if self.isInBoard(x-2, y+1) and self.isPlaceable(arr[x][y], x-2, y+1, arr):
 			moves.append(self.coordToStandard(x-2, y+1))
-		if self.isInBoard(x-2, y-1) and self.isPlaceable(arr[x][y], x-2, y-1):
+		if self.isInBoard(x-2, y-1) and self.isPlaceable(arr[x][y], x-2, y-1, arr):
 			moves.append(self.coordToStandard(x-2, y-1))
-		if self.isInBoard(x+1, y+2) and self.isPlaceable(arr[x][y], x+1, y+2):
+		if self.isInBoard(x+1, y+2) and self.isPlaceable(arr[x][y], x+1, y+2, arr):
 			moves.append(self.coordToStandard(x+1, y+2))
-		if self.isInBoard(x+1, y-2) and self.isPlaceable(arr[x][y], x+1, y-2):
+		if self.isInBoard(x+1, y-2) and self.isPlaceable(arr[x][y], x+1, y-2, arr):
 			moves.append(self.coordToStandard(x+1, y-2))
-		if self.isInBoard(x-1, y+2) and self.isPlaceable(arr[x][y], x-1, y+2):
+		if self.isInBoard(x-1, y+2) and self.isPlaceable(arr[x][y], x-1, y+2, arr):
 			moves.append(self.coordToStandard(x-1, y+2))
-		if self.isInBoard(x-1, y-2) and self.isPlaceable(arr[x][y], x-1, y-2):
+		if self.isInBoard(x-1, y-2) and self.isPlaceable(arr[x][y], x-1, y-2, arr):
 			moves.append(self.coordToStandard(x-1, y-2))
 
 		return moves
@@ -298,23 +294,22 @@ class Board:
 
 		moves = []
 
-		if self.isInBoard(x+1, y) and self.isPlaceable(arr[x][y], x+1, y):
+		if self.isInBoard(x+1, y) and self.isPlaceable(arr[x][y], x+1, y, arr):
 			moves.append(self.coordToStandard(x+1, y))
-		if self.isInBoard(x+1, y+1) and self.isPlaceable(arr[x][y], x+1, y+1):
+		if self.isInBoard(x+1, y+1) and self.isPlaceable(arr[x][y], x+1, y+1, arr):
 			moves.append(self.coordToStandard(x+1, y+1))
-		if self.isInBoard(x+1, y-1) and self.isPlaceable(arr[x][y], x+1, y-1):
+		if self.isInBoard(x+1, y-1) and self.isPlaceable(arr[x][y], x+1, y-1, arr):
 			moves.append(self.coordToStandard(x+1, y-1))
-		if self.isInBoard(x-1, y) and self.isPlaceable(arr[x][y], x-1, y):
+		if self.isInBoard(x-1, y) and self.isPlaceable(arr[x][y], x-1, y, arr):
 			moves.append(self.coordToStandard(x-1, y))
-		if self.isInBoard(x-1, y+1) and self.isPlaceable(arr[x][y], x-1, y+1):
+		if self.isInBoard(x-1, y+1) and self.isPlaceable(arr[x][y], x-1, y+1, arr):
 			moves.append(self.coordToStandard(x-1, y+1))
-		if self.isInBoard(x-1, y-1) and self.isPlaceable(arr[x][y], x-1, y-1):
+		if self.isInBoard(x-1, y-1) and self.isPlaceable(arr[x][y], x-1, y-1, arr):
 			moves.append(self.coordToStandard(x-1, y-1))
-		if self.isInBoard(x, y+1) and self.isPlaceable(arr[x][y], x, y+1):
+		if self.isInBoard(x, y+1) and self.isPlaceable(arr[x][y], x, y+1, arr):
 			moves.append(self.coordToStandard(x, y+1))
-		if self.isInBoard(x, y-1) and self.isPlaceable(arr[x][y], x, y-1):
+		if self.isInBoard(x, y-1) and self.isPlaceable(arr[x][y], x, y-1, arr):
 			moves.append(self.coordToStandard(x, y-1))
-
 		return moves
 		
 
@@ -357,34 +352,53 @@ class Board:
 
 		cArr = deepcopy(arr)
 		moves = self.getPotentialMoves(white, arr)
-
+		a = 0
 		#print(moves)
 		for key in moves:
-			a = 0
+			
 			legalMoves[key] = []
 			for m in moves[key]:
-				cArr = deepcopy(arr)
-				a+=1
 
+				cArr = deepcopy(arr)
+				
+				a    += 1
 				c    = self.standardToCoord(key)
 				c2   = self.standardToCoord(m)
+				val  = cArr[c2[0]][c2[1]]
 				cArr = self.swap(c[0], c[1], c2[0], c2[1], cArr)	#play the 'm' move
+
 				king = self.whereIsKing(white, cArr)
-				#print(king)
-				#print(a, cArr)
-				moves2 = self.getPotentialMoves(not white, cArr)	#WRONG ??? add a check if all a move don't put in check if possible
-				if not self.isAttacked(king[0], king[1], not white, moves2, cArr):
-					legalMoves[key].append(m)
+
+				moves2 = self.getPotentialMoves(not white, cArr)
+				if val != 0 and (cArr[c2[0]][c2[1]] == 22 or cArr[c2[0]][c2[1]] == 12):
+					kStd   = self.coordToStandard(c2[0], c2[1])
+					moves3 = self.getPotentialMoves(white, cArr)
+					#print(kStd, moves3[kStd])
+					if not self.isAttacked(c2[0], c2[1], white, moves3, cArr):
+						legalMoves[key].append(m)
+					for kk in moves2:
+						#print(kStd, moves2[kk])
+						for mkk in moves2[kk]:
+							if kStd == mkk:
+								legalMoves[key].pop()
+					
+
+				else:
+					if not self.isAttacked(king[0], king[1], not white, moves2, cArr):
+						legalMoves[key].append(m)
 
 
 
 		#check mate / pat ... verifs (if no legal moves)
 		if not bool([a for a in legalMoves.values() if a != []]):
 			king = self.whereIsKing(white, arr)
-			if self.isAttacked(king[0], king[1], not white, moves, arr):
+			if self.isAttacked(king[0], king[1], white, moves, arr):
 				print("Checkmate")
 			else:
 				print("Pat")
+
+		#1 checkmate and pat verif don't work
+		#2 king can take a piece even if after he is in check
 
 		return legalMoves
 
