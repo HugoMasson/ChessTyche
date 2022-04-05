@@ -6,14 +6,14 @@ BLACK    = (125, 135, 150)
 WHITE    = (232, 235, 239)
 SELECTED = (123, 217, 100)
 
-WHITE_PLAYER = 2
-BLACK_PLAYER = 1
+WHITE_PLAYER = True
+BLACK_PLAYER = False
 
 class Gui():
 
 	def __init__(self, size):
 		pygame.init()
-		self.isW = True
+		self.isW = WHITE_PLAYER
 		self.font = pygame.font.SysFont(None, 24)
 		self.bc = boardController.Board()
 		self.size = size	#squae 8x8
@@ -34,9 +34,10 @@ class Gui():
 
 	def draw(self):
 		if self.isW:
-			movesPossible = self.bc.getAllMovesPossible(WHITE_PLAYER)
+			movesPossible = self.bc.getLegalMoves(WHITE_PLAYER)
 		else:
-			movesPossible = self.bc.getAllMovesPossible(BLACK_PLAYER)
+			movesPossible = self.bc.getLegalMoves(BLACK_PLAYER)
+
 		for i in range(8):
 			for j in range(8):
 				#draw pattern
@@ -54,11 +55,11 @@ class Gui():
 					self.screen.blit(pygame.transform.scale(pygame.image.load(self.dirname+self.bc.getPieces()[self.bc.getBoard()[j][i]]), (self.cSize, self.cSize)), (i*self.cSize, j*self.cSize))
 		
 		if self.selected[0] != None:
+
 			#print(self.bc.isAttacked(self.selected[0], self.selected[1], self.isW))
-			key = self.bc.coordToStandard(self.selected[0], self.selected[1])
+			key = self.bc.coordToStandard(self.selected[1], self.selected[0])
 			if key in movesPossible:
 				for i in range(len(movesPossible[key])):
-					#print(self.stToCoorX(movesPossible[key][i][0]), self.stToCoorY(movesPossible[key][i][1]))
 					pygame.draw.circle(self.screen, SELECTED, (int(self.stToCoorX(movesPossible[key][i][0])*self.cSize)+self.cSize/2, int(self.stToCoorY(movesPossible[key][i][1])*self.cSize)+self.cSize/2), self.cSize/5)
 
 		#case pos
@@ -85,13 +86,6 @@ class Gui():
 					if self.pieceSelected:
 						if self.bc.move(self.selected[1], self.selected[0], tempB, tempA, self.isW):
 							self.isW = not self.isW
-
-						"""
-						if self.isW:
-							self.bc.getAllMovesPossible(WHITE_PLAYER)
-						else:
-							self.bc.getAllMovesPossible(BLACK_PLAYER)
-						"""
 						self.pieceSelected = False
 					if self.selected[0] == None or (self.selected[0] != tempA or self.selected[1] != tempB):
 						self.selected[0] = tempA
