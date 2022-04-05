@@ -54,14 +54,14 @@ class Board:
 		]
 		"""
 		self.board = [
-			[00,00,22,00,00,00,00,21],
+			[25,00,00,00,22,00,00,25],
 			[00,00,21,00,00,25,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,19,00,00,00,00,00],
 			[00,00,15,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[00,00,00,00,12,00,00,00],
+			[15,00,00,00,12,00,00,15],
 		]
 		
 	def getBoard(self):
@@ -112,7 +112,7 @@ class Board:
 		return (8-int(expr[1]), ord(expr[0])-97)
 
 
-	def move(self, x, y, x2, y2, white, arr="default"):		#Not finished (rock implementation)
+	def move(self, x, y, x2, y2, white, arr="default"):		#working
 		if arr == "default":
 			arr = self.board
 
@@ -125,12 +125,37 @@ class Board:
 		legalMoves = self.getLegalMoves(white, arr)
 		if key in legalMoves:
 			if self.coordToStandard(x2, y2) in legalMoves[key]:
-				if True:	#NOT A ROCK (VERIF) / NOT A PROMOTION
-					arr[x2][y2] = arr[x][y]
-					arr[x][y]	= 0
-					return True
-				else:		#REQUIRE SPECIAL TREATEMENT (ROCK or SPECIAL MOVE)
-					pass 
+				if   arr[x][y] == 12:
+					self.wKingMoved = True
+					if y == y2+2 and arr[x][y+1] == 0 and arr[x][y+2] == 0:
+						arr[x2][y2+1] = arr[x][y-4]
+						arr[x][y-4] = 0
+					elif y == y2-2 and arr[x][y-1] == 0 and arr[x][y-2] == 0:
+						arr[x2][y2-1] = arr[x][y+3]
+						arr[x][y+3] = 0
+				elif arr[x][y] == 22:
+					self.bKingMoved = True
+					if y == y2+2 and arr[x][y+1] == 0 and arr[x][y+2] == 0:
+						arr[x2][y2+1] = arr[x][y-4]
+						arr[x][y-4] = 0
+					elif y == y2-2 and arr[x][y-1] == 0 and arr[x][y-2] == 0:
+						arr[x2][y2-1] = arr[x][y+3]
+						arr[x][y+3] = 0
+				elif arr[x][y] == 15:
+					if x == 7 and y == 0:
+						self.wRooksMoved[0] = True
+					elif x == 7 and y == 7:
+						self.wRooksMoved[1] = True
+				elif arr[x][y] == 25:
+					if x == 0 and y == 0:
+						self.bRooksMoved[0] = True
+					elif x == 0 and y == 7:
+						self.bRooksMoved[1] = True
+
+				arr[x2][y2] = arr[x][y]
+				arr[x][y]	= 0
+				return True
+
 		return False
 
 	def isPlaceable(self, piece, x, y, arr="default"):		#working
@@ -144,7 +169,7 @@ class Board:
 		return False 
 
 
-	def isAttacked(self, x, y, white, moves, arr="default"):
+	def isAttacked(self, x, y, white, moves, arr="default"):	#working
 		if arr == "default":
 			arr = self.board
 
@@ -155,7 +180,7 @@ class Board:
 					return True
 		return False
 
-	def getAllPawnMoves(self, x, y, white, arr="default"):
+	def getAllPawnMoves(self, x, y, white, arr="default"):		#working
 		if arr == "default":
 			arr = self.board
 		direction = 1
@@ -310,6 +335,19 @@ class Board:
 			moves.append(self.coordToStandard(x, y+1))
 		if self.isInBoard(x, y-1) and self.isPlaceable(arr[x][y], x, y-1, arr):
 			moves.append(self.coordToStandard(x, y-1))
+
+		if white:
+			if not self.wKingMoved:
+				if not self.wRooksMoved[0] and arr[x][y-4] == 15:
+					moves.append(self.coordToStandard(x, y-2))
+				if not self.wRooksMoved[1] and arr[x][y+3] == 15:
+					moves.append(self.coordToStandard(x, y+2))
+		else:
+			if not self.bKingMoved:
+				if not self.bRooksMoved[0] and arr[x][y-4] == 25:
+					moves.append(self.coordToStandard(x, y-2))
+				if not self.bRooksMoved[1] and arr[x][y+3] == 25:
+					moves.append(self.coordToStandard(x, y+2))
 		return moves
 		
 
@@ -373,29 +411,39 @@ class Board:
 				if val != 0 and (cArr[c2[0]][c2[1]] == 22 or cArr[c2[0]][c2[1]] == 12):
 					kStd   = self.coordToStandard(c2[0], c2[1])
 					moves3 = self.getPotentialMoves(white, cArr)
-					#print(kStd, moves3[kStd])
 					if not self.isAttacked(c2[0], c2[1], white, moves3, cArr):
 						legalMoves[key].append(m)
 					for kk in moves2:
-						#print(kStd, moves2[kk])
 						for mkk in moves2[kk]:
 							if kStd == mkk:
 								legalMoves[key].pop()
-					
-
 				else:
 					if not self.isAttacked(king[0], king[1], not white, moves2, cArr):
 						legalMoves[key].append(m)
+						if cArr[c2[0]][c2[1]] == 12:
+							if c[1]-c2[1] == 2:
+								if self.isAttacked(c[0], c[1]-1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]-2, not white, moves2, cArr):
+									legalMoves[key].pop()
+							elif c[1]-c2[1] == -2:
+								if self.isAttacked(c[0], c[1]+1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]+2, not white, moves2, cArr):
+									legalMoves[key].pop()
+						
+						elif cArr[c2[0]][c2[1]] == 22 and (c[1]-c2[1] == 2 or c[1]-c2[1] == -2):
+							if c[1]-c2[1] == 2:
+								if self.isAttacked(c[0], c[1]-1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]-2, not white, moves2, cArr):
+									legalMoves[key].pop()
+							elif c[1]-c2[1] == -2:
+								if self.isAttacked(c[0], c[1]+1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]+2, not white, moves2, cArr):
+									legalMoves[key].pop()
+
+						
 
 
 
 		#check mate / pat ... verifs (if no legal moves)
 		if not bool([a for a in legalMoves.values() if a != []]):
 			king = self.whereIsKing(white, arr)
-			if self.isAttacked(king[0], king[1], white, moves, arr):
-				print("Checkmate")
-			else:
-				print("Pat")
+			print("Mat to Checkmate")
 
 		#1 checkmate and pat verif don't work
 		#2 king can take a piece even if after he is in check
