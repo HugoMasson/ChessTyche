@@ -41,7 +41,7 @@ class Board:
 			25:"assets/images/black_rook.png",
 			29:"assets/images/black_queen.png",
 		}
-		"""
+		
 		self.board = [
 			[25,23,24,29,22,24,23,25],
 			[21,21,21,21,21,21,21,21],
@@ -59,11 +59,11 @@ class Board:
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[00,00,00,00,00,00,00,00],
+			[00,00,00,00,21,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,15,00,12,00,00,00],
 		]
-
+		"""
 	def getBoard(self):
 		return self.board
 	def getPieces(self):
@@ -378,7 +378,13 @@ class Board:
 
 
 
-		#check mate / pat ... verifs (if legal move == 0)
+		#check mate / pat ... verifs (if no legal moves)
+		if not bool([a for a in legalMoves.values() if a != []]):
+			king = self.whereIsKing(white, arr)
+			if self.isAttacked(king[0], king[1], not white, moves, arr):
+				print("Checkmate")
+			else:
+				print("Pat")
 
 		return legalMoves
 
