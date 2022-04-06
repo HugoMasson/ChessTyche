@@ -1,21 +1,4 @@
-from copy import deepcopy
-
-
-
-#1/ same color pawn block king in diagonal (no idea why)
-
-#2/ verif each moves if king not in check if played
-#	(in the getAllMoves refactored just do a for
-#	with a copy of board and test form here)
-
-
-### !!!! REFACTOR ALMOST EVERYTHING !!!! ###
-
-
-
-
-
-
+from copy import deepcopy	#to copy a 2d array
 
 WHITE_PLAYER = 2
 BLACK_PLAYER = 1
@@ -54,14 +37,14 @@ class Board:
 		]
 		"""
 		self.board = [
-			[25,00,00,00,22,00,00,25],
-			[00,00,21,00,00,25,00,00],
-			[00,00,00,00,00,00,00,00],
-			[00,00,19,00,00,00,00,00],
-			[00,00,15,00,00,00,00,00],
+			[25,00,00,21,22,00,00,25],
+			[00,21,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[15,00,00,00,12,00,00,15],
+			[00,00,00,00,00,00,00,00],
+			[00,00,00,00,00,00,00,00],
+			[00,00,11,00,00,00,11,00],
+			[00,00,00,00,12,00,00,00],
 		]
 		
 	def getBoard(self):
@@ -111,7 +94,6 @@ class Board:
 	def standardToCoord(self, expr):	#ex: a2 -> 6 0
 		return (8-int(expr[1]), ord(expr[0])-97)
 
-
 	def move(self, x, y, x2, y2, white, arr="default"):		#working
 		if arr == "default":
 			arr = self.board
@@ -151,9 +133,14 @@ class Board:
 						self.bRooksMoved[0] = True
 					elif x == 0 and y == 7:
 						self.bRooksMoved[1] = True
+				
 
 				arr[x2][y2] = arr[x][y]
 				arr[x][y]	= 0
+				if arr[x2][y2] == 11 and x2 == 0:
+					arr[x2][y2] = 19
+				elif arr[x2][y2] == 21 and x2 == 7:
+					arr[x2][y2] = 29
 				return True
 
 		return False
@@ -167,7 +154,6 @@ class Board:
 			elif (piece < 20 and piece > 0 and arr[x][y] > 20 or  arr[x][y] == 0):
 				return True
 		return False 
-
 
 	def isAttacked(self, x, y, white, moves, arr="default"):	#working
 		if arr == "default":
@@ -283,10 +269,8 @@ class Board:
 			count += 1
 		return moves
 
-
 	def getAllQueenMoves(self, x, y, white, arr="default"):		#working
 		return self.getAllRookMoves(x, y, white, arr) + self.getAllBishopMoves(x, y, white, arr)
-
 
 	def getAllKnightMoves(self, x, y, white, arr="default"):	#working
 		if arr == "default":
@@ -311,7 +295,6 @@ class Board:
 			moves.append(self.coordToStandard(x-1, y-2))
 
 		return moves
-
 
 	def getAllKingMoves(self, x, y, white, arr="default"):		#working (not rock)
 		if arr == "default":
@@ -350,7 +333,6 @@ class Board:
 					moves.append(self.coordToStandard(x, y+2))
 		return moves
 		
-
 	def getPotentialMoves(self, white, arr="default"):			#working
 		potentialMoves = {}
 
@@ -422,33 +404,48 @@ class Board:
 						legalMoves[key].append(m)
 						if cArr[c2[0]][c2[1]] == 12:
 							if c[1]-c2[1] == 2:
-								if self.isAttacked(c[0], c[1]-1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]-2, not white, moves2, cArr):
+								if self.isAttacked(c[0], c[1]-1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]-2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
 									legalMoves[key].pop()
 							elif c[1]-c2[1] == -2:
-								if self.isAttacked(c[0], c[1]+1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]+2, not white, moves2, cArr):
+								if self.isAttacked(c[0], c[1]+1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]+2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
 									legalMoves[key].pop()
 						
-						elif cArr[c2[0]][c2[1]] == 22 and (c[1]-c2[1] == 2 or c[1]-c2[1] == -2):
+						elif cArr[c2[0]][c2[1]] == 22:
 							if c[1]-c2[1] == 2:
-								if self.isAttacked(c[0], c[1]-1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]-2, not white, moves2, cArr):
+								if self.isAttacked(c[0], c[1]-1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]-2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
 									legalMoves[key].pop()
 							elif c[1]-c2[1] == -2:
-								if self.isAttacked(c[0], c[1]+1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]+2, not white, moves2, cArr):
+								if self.isAttacked(c[0], c[1]+1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]+2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
 									legalMoves[key].pop()
-
-						
-
-
 
 		#check mate / pat ... verifs (if no legal moves)
 		if not bool([a for a in legalMoves.values() if a != []]):
-			king = self.whereIsKing(white, arr)
-			print("Mat to Checkmate")
-
-		#1 checkmate and pat verif don't work
-		#2 king can take a piece even if after he is in check
+			king   = self.whereIsKing(white, arr)
+			moves4 = self.getPotentialMoves(not white, arr)
+			if self.isAttacked(king[0], king[1], white, moves4, arr):
+				print("Mate")
+			else:
+				print(king[0], king[1], moves, arr)
 
 		return legalMoves
 
 		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			
