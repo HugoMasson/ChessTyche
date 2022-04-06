@@ -14,9 +14,10 @@ class Gui():
 	def __init__(self, size):
 		pygame.init()
 		self.isW = WHITE_PLAYER
-		self.font = pygame.font.SysFont(None, 24)
+		self.font    = pygame.font.SysFont(None, 24)
+		self.fontEnd = pygame.font.SysFont(None, 35)
 		self.bc = boardController.Board()
-		self.size = size	#squae 8x8
+		self.size = size	#square 8x8
 		self.cSize = int(size/8)
 		self.screen = None
 		self.dirname = os.path.dirname(__file__)+"/../"	#right on ChessPyGame/ folder
@@ -33,6 +34,8 @@ class Gui():
 		pygame.display.set_caption('Chess Game')
 
 	def draw(self):
+		status = self.bc.getStatus()
+
 		if self.isW:
 			movesPossible = self.bc.getLegalMoves(WHITE_PLAYER)
 		else:
@@ -45,31 +48,26 @@ class Gui():
 					pygame.draw.rect(self.screen, WHITE, pygame.Rect(i*self.cSize, j*self.cSize, self.cSize, self.cSize))
 				else:
 					pygame.draw.rect(self.screen, BLACK, pygame.Rect(i*self.cSize, j*self.cSize, self.cSize, self.cSize))
-
 				#draw selected tile
 				if i == self.selected[0] and j == self.selected[1]:
 					pygame.draw.rect(self.screen, SELECTED, pygame.Rect(i*self.cSize, j*self.cSize, self.cSize, self.cSize))
-
 				#draw pieces
 				if self.bc.getBoard()[j][i] != 0:
 					self.screen.blit(pygame.transform.scale(pygame.image.load(self.dirname+self.bc.getPieces()[self.bc.getBoard()[j][i]]), (self.cSize, self.cSize)), (i*self.cSize, j*self.cSize))
 		
 		if self.selected[0] != None:
-
 			#print(self.bc.isAttacked(self.selected[0], self.selected[1], self.isW))
 			key = self.bc.coordToStandard(self.selected[1], self.selected[0])
 			if key in movesPossible:
 				for i in range(len(movesPossible[key])):
 					pygame.draw.circle(self.screen, SELECTED, (int(self.stToCoorX(movesPossible[key][i][0])*self.cSize)+self.cSize/2, int(self.stToCoorY(movesPossible[key][i][1])*self.cSize)+self.cSize/2), self.cSize/5)
-
+		
 		#case pos
 		for x in range(8):
 			s = self.font.render(str(8-x), True, SELECTED)
 			self.screen.blit(s, (5, x*self.cSize+5))
 			s = self.font.render(chr(97+x), True, SELECTED)
 			self.screen.blit(s, (x*self.cSize+0.5*self.cSize, 8*self.cSize-15))
-		
-
 		pygame.display.flip()
 
 

@@ -6,6 +6,7 @@ BLACK_PLAYER = 1
 class Board:
 
 	def __init__(self):
+		self.status = "gaming"
 		self.wKingMoved = False
 		self.bKingMoved = False
 		self.wRooksMoved = [False, False]
@@ -42,11 +43,13 @@ class Board:
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[00,00,00,00,00,00,00,00],
-			[00,00,11,00,00,00,11,00],
+			[00,00,00,00,00,19,00,00],
+			[00,00,19,19,00,00,11,00],
 			[00,00,00,00,12,00,00,00],
 		]
-		
+	
+	def getStatus(self):
+		return self.status
 	def getBoard(self):
 		return self.board
 	def getPieces(self):
@@ -321,15 +324,15 @@ class Board:
 
 		if white:
 			if not self.wKingMoved:
-				if not self.wRooksMoved[0] and arr[x][y-4] == 15:
+				if not self.wRooksMoved[0] and arr[x][y-4] == 15 and arr[x][y-1] == 0 and arr[x][y-2] == 0:
 					moves.append(self.coordToStandard(x, y-2))
-				if not self.wRooksMoved[1] and arr[x][y+3] == 15:
+				if not self.wRooksMoved[1] and arr[x][y+3] == 15 and arr[x][y+1] == 0 and arr[x][y+2] == 0:
 					moves.append(self.coordToStandard(x, y+2))
 		else:
 			if not self.bKingMoved:
-				if not self.bRooksMoved[0] and arr[x][y-4] == 25:
+				if not self.bRooksMoved[0] and arr[x][y-4] == 25 and arr[x][y-1] == 0 and arr[x][y-2] == 0:
 					moves.append(self.coordToStandard(x, y-2))
-				if not self.bRooksMoved[1] and arr[x][y+3] == 25:
+				if not self.bRooksMoved[1] and arr[x][y+3] == 25 and arr[x][y+1] == 0 and arr[x][y+2] == 0:
 					moves.append(self.coordToStandard(x, y+2))
 		return moves
 		
@@ -367,66 +370,70 @@ class Board:
 	#return list of all the possible moves for a position
 	def getLegalMoves(self, white, arr="default"):
 		legalMoves = {}
-		if arr == "default":
-			arr = self.board
+		if self.status == "gaming":
+			if arr == "default":
+				arr = self.board
 
-		cArr = deepcopy(arr)
-		moves = self.getPotentialMoves(white, arr)
-		a = 0
-		#print(moves)
-		for key in moves:
-			
-			legalMoves[key] = []
-			for m in moves[key]:
+			cArr = deepcopy(arr)
+			moves = self.getPotentialMoves(white, arr)
+			a = 0
+			#print(moves)
+			for key in moves:
+				legalMoves[key] = []
+				for m in moves[key]:
 
-				cArr = deepcopy(arr)
-				
-				a    += 1
-				c    = self.standardToCoord(key)
-				c2   = self.standardToCoord(m)
-				val  = cArr[c2[0]][c2[1]]
-				cArr = self.swap(c[0], c[1], c2[0], c2[1], cArr)	#play the 'm' move
+					cArr = deepcopy(arr)
+					
+					a    += 1
+					c    = self.standardToCoord(key)
+					c2   = self.standardToCoord(m)
+					val  = cArr[c2[0]][c2[1]]
+					cArr = self.swap(c[0], c[1], c2[0], c2[1], cArr)	#play the 'm' move
 
-				king = self.whereIsKing(white, cArr)
+					king = self.whereIsKing(white, cArr)
 
-				moves2 = self.getPotentialMoves(not white, cArr)
-				if val != 0 and (cArr[c2[0]][c2[1]] == 22 or cArr[c2[0]][c2[1]] == 12):
-					kStd   = self.coordToStandard(c2[0], c2[1])
-					moves3 = self.getPotentialMoves(white, cArr)
-					if not self.isAttacked(c2[0], c2[1], white, moves3, cArr):
-						legalMoves[key].append(m)
-					for kk in moves2:
-						for mkk in moves2[kk]:
-							if kStd == mkk:
-								legalMoves[key].pop()
+					moves2 = self.getPotentialMoves(not white, cArr)
+					if val != 0 and (cArr[c2[0]][c2[1]] == 22 or cArr[c2[0]][c2[1]] == 12):
+						kStd   = self.coordToStandard(c2[0], c2[1])
+						moves3 = self.getPotentialMoves(white, cArr)
+						if not self.isAttacked(c2[0], c2[1], white, moves3, cArr):
+							legalMoves[key].append(m)
+						for kk in moves2:
+							for mkk in moves2[kk]:
+								if kStd == mkk:
+									legalMoves[key].pop()
+					else:
+						if not self.isAttacked(king[0], king[1], not white, moves2, cArr):
+							legalMoves[key].append(m)
+							if cArr[c2[0]][c2[1]] == 12:
+								if c[1]-c2[1] == 2:
+									if self.isAttacked(c[0], c[1]-1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]-2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
+										legalMoves[key].pop()
+								elif c[1]-c2[1] == -2:
+									if self.isAttacked(c[0], c[1]+1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]+2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
+										legalMoves[key].pop()
+							
+							elif cArr[c2[0]][c2[1]] == 22:
+								if c[1]-c2[1] == 2:
+									if self.isAttacked(c[0], c[1]-1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]-2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
+										legalMoves[key].pop()
+								elif c[1]-c2[1] == -2:
+									if self.isAttacked(c[0], c[1]+1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]+2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
+										legalMoves[key].pop()
+
+			#check mate / pat ... verifs (if no legal moves)
+			if not bool([a for a in legalMoves.values() if a != []]):
+				king   = self.whereIsKing(white, arr)
+				moves4 = self.getPotentialMoves(not white, arr)
+				if self.isAttacked(king[0], king[1], white, moves4, arr):
+					if white:
+						self.status = "Checkmate (white lost)"
+					else:
+						self.status = "Checkmate (black lost)"
+
 				else:
-					if not self.isAttacked(king[0], king[1], not white, moves2, cArr):
-						legalMoves[key].append(m)
-						if cArr[c2[0]][c2[1]] == 12:
-							if c[1]-c2[1] == 2:
-								if self.isAttacked(c[0], c[1]-1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]-2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
-									legalMoves[key].pop()
-							elif c[1]-c2[1] == -2:
-								if self.isAttacked(c[0], c[1]+1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]+2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
-									legalMoves[key].pop()
-						
-						elif cArr[c2[0]][c2[1]] == 22:
-							if c[1]-c2[1] == 2:
-								if self.isAttacked(c[0], c[1]-1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]-2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
-									legalMoves[key].pop()
-							elif c[1]-c2[1] == -2:
-								if self.isAttacked(c[0], c[1]+1, not white, moves2, cArr) or self.isAttacked(c[0], c[1]+2, not white, moves2, cArr) or self.isAttacked(c[0], c[1], not white, moves2, cArr):
-									legalMoves[key].pop()
-
-		#check mate / pat ... verifs (if no legal moves)
-		if not bool([a for a in legalMoves.values() if a != []]):
-			king   = self.whereIsKing(white, arr)
-			moves4 = self.getPotentialMoves(not white, arr)
-			if self.isAttacked(king[0], king[1], white, moves4, arr):
-				print("Mate")
-			else:
-				print(king[0], king[1], moves, arr)
-
+					self.status = "Draw"
+				print(self.status)
 		return legalMoves
 
 		
