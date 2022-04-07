@@ -1,6 +1,7 @@
 import pygame
 import os
 import boardController
+import random
 
 BLACK    = (125, 135, 150)
 WHITE    = (232, 235, 239)
@@ -11,9 +12,12 @@ BLACK_PLAYER = False
 
 class Gui():
 
-	def __init__(self, size):
+	def __init__(self, size, ai):
 		pygame.init()
-		self.isW = WHITE_PLAYER
+		#self.isAiStart = random.choice([True, False])
+		self.isAiStart = False
+		self.isW 	 = self.isAiStart
+		self.ai      = ai
 		self.font    = pygame.font.SysFont(None, 24)
 		self.fontEnd = pygame.font.SysFont(None, 35)
 		self.bc = boardController.Board()
@@ -23,6 +27,12 @@ class Gui():
 		self.dirname = os.path.dirname(__file__)+"/../"	#right on ChessPyGame/ folder
 		self.selected = [None, None]
 		self.pieceSelected = False
+		if not self.isAiStart:		#DON'T WORK
+			result = self.ai.play(not self.isW, self.bc.getLegalMoves(not self.isW))
+			if result != None:
+				start = self.bc.standardToCoord(result[0])
+				end   = self.bc.standardToCoord(result[1])
+				self.bc.move(start[0], start[1], end[0], end[1], not self.isW)
 
 	def stToCoorY(self, a):
 		return 8-int(a)
@@ -56,7 +66,6 @@ class Gui():
 					self.screen.blit(pygame.transform.scale(pygame.image.load(self.dirname+self.bc.getPieces()[self.bc.getBoard()[j][i]]), (self.cSize, self.cSize)), (i*self.cSize, j*self.cSize))
 		
 		if self.selected[0] != None:
-			#print(self.bc.isAttacked(self.selected[0], self.selected[1], self.isW))
 			key = self.bc.coordToStandard(self.selected[1], self.selected[0])
 			if key in movesPossible:
 				for i in range(len(movesPossible[key])):
@@ -77,13 +86,20 @@ class Gui():
 			for event in pygame.event.get():
 				toRefresh = True
 				if event.type == pygame.MOUSEBUTTONDOWN:
-					
 					pos = pygame.mouse.get_pos()
 					tempA = int(pos[0]/self.cSize)
 					tempB = int(pos[1]/self.cSize)
 					if self.pieceSelected:
 						if self.bc.move(self.selected[1], self.selected[0], tempB, tempA, self.isW):
-							self.isW = not self.isW
+							#self.isW = not self.isW
+
+							#AI playtime :p
+							result = self.ai.play(not self.isW, self.bc.getLegalMoves(not self.isW))
+							if result != None:
+								start = self.bc.standardToCoord(result[0])
+								end   = self.bc.standardToCoord(result[1])
+								self.bc.move(start[0], start[1], end[0], end[1], not self.isW)
+
 						self.pieceSelected = False
 					if self.selected[0] == None or (self.selected[0] != tempA or self.selected[1] != tempB):
 						self.selected[0] = tempA

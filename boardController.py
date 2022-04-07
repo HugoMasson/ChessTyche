@@ -25,7 +25,7 @@ class Board:
 			25:"assets/images/black_rook.png",
 			29:"assets/images/black_queen.png",
 		}
-		"""
+		
 		self.board = [
 			[25,23,24,29,22,24,23,25],
 			[21,21,21,21,21,21,21,21],
@@ -38,16 +38,16 @@ class Board:
 		]
 		"""
 		self.board = [
-			[25,00,00,21,22,00,00,25],
-			[00,21,00,00,00,00,00,00],
+			[25,00,00,00,22,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,00,00,00,00],
-			[00,00,00,00,00,19,00,00],
-			[00,00,19,19,00,00,11,00],
+			[00,00,00,00,00,00,00,00],
+			[00,19,00,00,00,19,00,00],
+			[00,00,00,00,00,00,00,00],
 			[00,00,00,00,12,00,00,00],
 		]
-	
+		"""
 	def getStatus(self):
 		return self.status
 	def getBoard(self):
@@ -324,16 +324,20 @@ class Board:
 
 		if white:
 			if not self.wKingMoved:
-				if not self.wRooksMoved[0] and arr[x][y-4] == 15 and arr[x][y-1] == 0 and arr[x][y-2] == 0:
-					moves.append(self.coordToStandard(x, y-2))
-				if not self.wRooksMoved[1] and arr[x][y+3] == 15 and arr[x][y+1] == 0 and arr[x][y+2] == 0:
-					moves.append(self.coordToStandard(x, y+2))
+				if self.isInBoard(x, y-4) and self.isInBoard(x, y-1) and self.isInBoard(x, y-2):
+					if not self.wRooksMoved[0] and arr[x][y-4] == 15 and arr[x][y-1] == 0 and arr[x][y-2] == 0:
+						moves.append(self.coordToStandard(x, y-2))
+				if self.isInBoard(x, y+3) and self.isInBoard(x, y+1) and self.isInBoard(x, y+2):
+					if not self.wRooksMoved[1] and arr[x][y+3] == 15 and arr[x][y+1] == 0 and arr[x][y+2] == 0:
+						moves.append(self.coordToStandard(x, y+2))
 		else:
 			if not self.bKingMoved:
-				if not self.bRooksMoved[0] and arr[x][y-4] == 25 and arr[x][y-1] == 0 and arr[x][y-2] == 0:
-					moves.append(self.coordToStandard(x, y-2))
-				if not self.bRooksMoved[1] and arr[x][y+3] == 25 and arr[x][y+1] == 0 and arr[x][y+2] == 0:
-					moves.append(self.coordToStandard(x, y+2))
+				if self.isInBoard(x, y-4) and self.isInBoard(x, y-1) and self.isInBoard(x, y-2):
+					if not self.bRooksMoved[0] and arr[x][y-4] == 25 and arr[x][y-1] == 0 and arr[x][y-2] == 0:
+						moves.append(self.coordToStandard(x, y-2))
+				if self.isInBoard(x, y+3) and self.isInBoard(x, y+1) and self.isInBoard(x, y+2):
+					if not self.bRooksMoved[1] and arr[x][y+3] == 25 and arr[x][y+1] == 0 and arr[x][y+2] == 0:
+						moves.append(self.coordToStandard(x, y+2))
 		return moves
 		
 	def getPotentialMoves(self, white, arr="default"):			#working

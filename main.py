@@ -17,10 +17,11 @@
 
 
 import game_gui.gui as gui
+import players.randomPlayer as ai
 
 def main():
 	print("Creating game instance...")
-	g = gui.Gui(800)
+	g = gui.Gui(800, ai.RandomPlayer())
 	print("Game instance created")
 	g.init()
 	print("Window init successful")
